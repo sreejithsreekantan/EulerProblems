@@ -1,0 +1,42 @@
+/*
+Smallest multiple
+Problem 5
+
+2520 is the smallest number that can be divided by each of the numbers from 1 to 10 without any remainder.
+
+What is the smallest positive number that is evenly divisible by all of the numbers from 1 to 20?
+
+*/
+#include <iostream>
+
+#define X 20
+
+using namespace std;
+
+long hcf ( const long & small_num, const long & big_num ) {
+  if ( small_num > big_num ) {
+		return hcf ( big_num, small_num );
+	}
+	else {
+		if ( big_num % small_num == 0 ) {
+			return small_num;
+		}
+		else {
+			return hcf ( big_num % small_num, small_num );
+		}
+	}
+}
+
+int main ( int argc, char *argv[] ) {
+	long result = 1;
+	long temp_hcf;
+	for ( int i = 1; i <= X; i++ ) {
+		temp_hcf = hcf ( result, i );
+		result /= temp_hcf;
+		result *= i;
+	}
+	cout << "Result = " << result << endl;
+	return 0;
+}
+
+// Result = 232792560
