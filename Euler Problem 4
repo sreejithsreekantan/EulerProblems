@@ -1,0 +1,96 @@
+/*
+Largest palindrome product
+Problem 4
+
+A palindromic number reads the same both ways. The largest palindrome made from the product of two 2-digit numbers is 9009 = 91 × 99.
+
+Find the largest palindrome made from the product of two 3-digit numbers.
+
+*/
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+#include <iterator>
+#include <vector>
+#include <boost/lambda/lambda.hpp>
+#include <boost/functional.hpp>
+#include <boost/function.hpp>
+
+#define num_of_digits_in_num 3
+
+using namespace std;
+using namespace boost::lambda;
+
+long palindromeNumJustBelow ( long input ) {
+  vector<int> inputAsArray; //array of single-digit-numbers
+	
+	long temp = input;
+	while ( temp ) {
+		inputAsArray.push_back ( temp%static_cast<long>(10) );
+		temp = floor( temp/static_cast<long>(10) );
+	}
+	
+	int numOfDigits = inputAsArray.size();
+	
+	temp = floor ( ( inputAsArray.size()/2 ) ) ;
+	long temp_input_half = 0;
+	boost::function<void (int)> f2 = ( var(temp_input_half)*=10, var(temp_input_half)+=boost::lambda::_1);
+	for_each ( inputAsArray.rbegin(), inputAsArray.rend()-temp, f2 );
+	
+	temp_input_half--;
+	
+	long temp1 = temp;
+	while ( temp_input_half ) {
+		inputAsArray [ temp1++ ] = ( temp_input_half%static_cast<long>(10) );
+		temp_input_half = floor( temp_input_half/static_cast<long>(10) );
+	}
+	
+	// mirror all the digits from index temp till end
+	while ( temp < numOfDigits ) {
+		inputAsArray [ numOfDigits - temp -1 ] = inputAsArray [ temp ] ;
+		temp ++ ;
+	}
+	
+	temp = 0;
+	boost::function<void (int)> f1 = ( var(temp)*=10, var(temp)+=boost::lambda::_1);
+	
+	for_each ( inputAsArray.rbegin(), inputAsArray.rend(), f1 );
+	
+	return temp;
+}
+int main ( int argc, char * argv[] ) {
+	
+	long num_min, num_max;
+	if ( num_of_digits_in_num==1 ) {
+		num_min = 0;
+	}
+	else {
+		num_min = pow( static_cast<double>(10), static_cast<double>(num_of_digits_in_num-1) );
+	}
+	
+	num_max = (pow( static_cast<double>(10), static_cast<double>(num_of_digits_in_num) ) - 1 );
+	
+	long prod_min, prod_max;
+	prod_min = num_min*num_min;
+	prod_max = num_max*num_max;
+	
+	long palindrome_num = prod_max;
+	long temp_div2;
+	
+	bool ans_found = false;
+	while ( palindrome_num > prod_min && !ans_found) {
+		palindrome_num = palindromeNumJustBelow(palindrome_num);
+
+		for (int temp_div1 = num_max; temp_div1 >= num_min && !ans_found; temp_div1-- ) {
+			temp_div2 = palindrome_num/temp_div1;
+			if ( palindrome_num % temp_div1 == 0 && temp_div2 <= num_max && temp_div2 >= num_min ) {
+				cout << "Largest palindrome made from the product of two " 
+				<< num_of_digits_in_num << "-digit numbers is " << palindrome_num
+				<< " = " << temp_div1 << " * " << temp_div2 << endl;
+				ans_found = true;
+			}
+			
+		}
+	}
+}
+
